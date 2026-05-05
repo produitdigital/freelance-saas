@@ -2,64 +2,68 @@ import { auth, db } from "./firebase.js";
 import {
   collection,
   addDoc,
-  getDocs,
-  doc,
-  getDoc
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* =========================
-   GET USER PLAN
+   GLOBAL STATE
 ========================= */
-export async function getUserPlan(){
-
-  const uid = auth.currentUser.uid;
-
-  const snap = await getDoc(doc(db, "users", uid));
-
-  if(snap.exists()){
-    return snap.data().plan || "free";
-  }
-
-  return "free";
-}
+let income = 0;
+let expense = 0;
 
 /* =========================
    ADD TRANSACTION
 ========================= */
-export async function addTransaction(type, amount){
+window.addTransaction = async () => {
+
+  if (!auth.currentUser) {
+    alert("Please login first");
+    return;
+  }
 
   const uid = auth.currentUser.uid;
 
+  const type = document.getElementById("type").value;
+  const amount = Number(document.getElementById("amount").value);
+
   await addDoc(collection(db, "users", uid, "transactions"), {
-    type: type,
-    amount: Number(amount),
+    type,
+    amount,
     createdAt: new Date()
   });
 
-}
+  loadData();
+};
 
 /* =========================
-   GET TOTALS (FOR DASHBOARD)
+   LOAD DASHBOARD DATA
 ========================= */
-export async function getTotals(){
+async function loadData() {
+
+  if (!auth.currentUser) return;
 
   const uid = auth.currentUser.uid;
 
-  const snap = await getDocs(collection(db, "users", uid, "transactions"));
+  const snap = await getDocs(
+    collection(db, "users", uid, "transactions")
+  );
 
-  let income = 0;
-  let expense = 0;
+  income = 0;
+  expense = 0;
 
   snap.forEach(doc => {
     const d = doc.data();
 
-    if(d.type === "income") income += d.amount;
-    if(d.type === "expense") expense += d.amount;
+    if (d.type === "income") income += d.amount;
+    if (d.type === "expense") expense += d.amount;
   });
 
-  return {
-    income,
-    expense,
-    profit: income - expense
-  };
+  document.getElementById("income").innerText = income;
+  document.getElementById("expense").innerText = expense;
+  document.getElementById("profit").innerText = income - expense;
 }
+
+/* =========================
+   INIT
+========================= */
+loadData();
