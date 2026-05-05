@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <h2>📊 Dashboard</h2>
+
+  <div class="card">
+    <p>Income: <span id="income">0</span></p>
+    <p>Expense: <span id="expense">0</span></p>
+    <p>Profit: <span id="profit">0</span></p>
+  </div>
+
+  <div class="card">
+    <select id="type">
+      <option value="income">Income</option>
+      <option value="expense">Expense</option>
+    </select>
+
+    <input id="amount" placeholder="Amount">
+    <button onclick="add()">Add</button>
+  </div>
+
+  <div class="card">
+    <a href="pricing.html">
+      <button>🚀 Upgrade to Pro</button>
+    </a>
+  </div>
+
+</div>
+
+<script type="module">
+import { auth, db } from "./firebase.js";
+import {
+  collection,
+  addDoc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+let income = 0;
+let expense = 0;
+
+window.add = async () => {
+  const uid = auth.currentUser.uid;
+
+  await addDoc(collection(db, "users", uid, "transactions"), {
+    type: document.getElementById("type").value,
+    amount: Number(document.getElementById("amount").value),
+    createdAt: new Date()
+  });
+
+  load();
+};
+
+async function load() {
+  const uid = auth.currentUser.uid;
+
+  const snap = await getDocs(collection(db, "users", uid, "transactions"));
+
+  income = 0;
+  expense = 0;
+
+  snap.forEach(doc => {
+    const d = doc.data();
+    if (d.type === "income") income += d.amount;
+    if (d.type === "expense") expense += d.amount;
+  });
+
+  document.getElementById("income").innerText = income;
+  document.getElementById("expense").innerText = expense;
+  document.getElementById("profit").innerText = income - expense;
+}
+
+load();
+</script>
+
+</body>
+</html>
