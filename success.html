@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Success</title>
+</head>
+<body>
+
+<h1>🎉 Payment Successful</h1>
+
+<button onclick="activate()">Activate Pro</button>
+
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+window.activate = async () => {
+  const uid = auth.currentUser.uid;
+
+  await updateDoc(doc(db, "users", uid), {
+    plan: "pro"
+  });
+
+  alert("You are PRO now 🚀");
+  window.location.href = "dashboard.html";
+};
+</script>
+
+</body>
+</html>
