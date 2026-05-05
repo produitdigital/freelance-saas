@@ -2,7 +2,8 @@ import { auth, db } from "./firebase.js";
 import {
   collection,
   addDoc,
-  getDocs
+  getDocs,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* =========================
@@ -12,7 +13,7 @@ let income = 0;
 let expense = 0;
 
 /* =========================
-   ADD TRANSACTION
+   ADD TRANSACTION (PRO FIXED)
 ========================= */
 window.addTransaction = async () => {
 
@@ -26,10 +27,16 @@ window.addTransaction = async () => {
   const type = document.getElementById("type").value;
   const amount = Number(document.getElementById("amount").value);
 
+  // ❌ validation simple (important SaaS)
+  if (!amount || amount <= 0) {
+    alert("Invalid amount");
+    return;
+  }
+
   await addDoc(collection(db, "users", uid, "transactions"), {
     type,
     amount,
-    createdAt: new Date()
+    createdAt: serverTimestamp()   // ✅ PRO FIX
   });
 
   loadData();
