@@ -44,15 +44,20 @@ body{
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* 🔥 FIREBASE CONFIG */
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID"
+  apiKey: "AIzaSyA5lfFr54rr99_ttVPMGXiFUBI5SWgFGVg",
+  authDomain: "freelance-saas-576c8.firebaseapp.com",
+  projectId: "freelance-saas-576c8",
+  storageBucket: "freelance-saas-576c8.firebasestorage.app",
+  messagingSenderId: "17320746328",
+  appId: "1:17320746328:web:43b94276d4c951d69f592d",
+  measurementId: "G-JVB62TKK5C"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -62,28 +67,6 @@ const db = getFirestore(app);
 /* 📊 TOTAL VARIABLES */
 let incomeTotal = 0;
 let expenseTotal = 0;
-
-/* 🚀 LOAD FIREBASE DATA */
-async function loadData(){
-
-  const uid = auth.currentUser.uid;
-
-  const snap = await getDocs(collection(db, "users", uid, "transactions"));
-
-  snap.forEach(doc => {
-    const data = doc.data();
-
-    if(data.type === "income"){
-      incomeTotal += data.amount;
-    }
-
-    if(data.type === "expense"){
-      expenseTotal += data.amount;
-    }
-  });
-
-  drawChart();
-}
 
 /* 📊 DRAW CHART */
 function drawChart(){
@@ -102,8 +85,34 @@ function drawChart(){
 
 }
 
-/* ▶️ START */
-loadData();
+/* 🚀 LOAD DATA SAFELY AFTER LOGIN */
+onAuthStateChanged(auth, async (user) => {
+
+  if(!user){
+    console.log("User not logged in");
+    return;
+  }
+
+  incomeTotal = 0;
+  expenseTotal = 0;
+
+  const snap = await getDocs(collection(db, "users", user.uid, "transactions"));
+
+  snap.forEach(doc => {
+    const data = doc.data();
+
+    if(data.type === "income"){
+      incomeTotal += data.amount;
+    }
+
+    if(data.type === "expense"){
+      expenseTotal += data.amount;
+    }
+  });
+
+  drawChart();
+
+});
 
 </script>
 
