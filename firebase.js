@@ -3,10 +3,13 @@ import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyA5lfFr54rr99_ttVPMGXiFUBI5SWgFGVg",
+  authDomain: "freelance-saas-576c8.firebaseapp.com",
+  projectId: "freelance-saas-576c8",
+  storageBucket: "freelance-saas-576c8.firebasestorage.app",
+  messagingSenderId: "17320746328",
+  appId: "1:17320746328:web:43b94276d4c951d69f592d",
+  measurementId: "G-JVB62TKK5C"
 };
 
 const app = initializeApp(firebaseConfig);
